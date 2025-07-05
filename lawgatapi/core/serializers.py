@@ -63,3 +63,36 @@ class OTPVerifySerializer(serializers.Serializer):
             user.save()
             return data
         raise serializers.ValidationError("Invalid OTP")
+    
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+
+    def validate_new_password(self, value):
+        if len(value) < 8:
+            raise serializers.ValidationError("Password must be at least 8 characters long.")
+        return value
+# class ProfileImageSerializer(serializers.ModelSerializer):
+#     profile_picture = serializers.SerializerMethodField()
+
+#     def get_profile_picture(self, obj):
+#         request = self.context.get("request")
+#         if request and obj.profile_picture and hasattr(obj.profile_picture, 'url'):
+#             return request.build_absolute_uri(obj.profile_picture.url)
+#         return None
+
+#     class Meta:
+#         model = User
+#         fields = ['profile_picture']
+
+# class UserProfileSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = User
+#         fields = [
+#             'id', 
+#             'username', 
+#             'email', 
+#             'profile_picture'
+#         ]
+#         # Make most fields read-only; this endpoint is just for the picture
+#         read_only_fields = ['id', 'username', 'email']

@@ -1,11 +1,17 @@
 from django.db import models
-
+from django.contrib.auth.models import User
+from django.db.models.signals import post_save
 # Create your models here.
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+# A helper function to define the upload path
+def user_profile_picture_path(instance, filename):
+    # file will be uploaded to MEDIA_ROOT/profile_pictures/user_<id>/<filename>
+    return f'profile_pictures/user_{instance.id}/{filename}'
+
 class User(AbstractUser):
-    profile_picture = models.ImageField(upload_to='profiles/', null=True, blank=True)
+    profile_picture = models.ImageField(upload_to=user_profile_picture_path, null=True, blank=True)
     email = models.EmailField(unique=True)
     otp = models.CharField(max_length=6, blank=True, null=True)
     is_verified = models.BooleanField(default=False)

@@ -1,13 +1,17 @@
 # core/views.py
 
-from rest_framework import generics, permissions, filters
+from rest_framework import generics, permissions, filters,parsers
 from .models import Subject, Question, QuestionAttempt, User
 from .serializers import *
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.response import Response
 from django.db.models import Count, Q
 from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
+# from .serializers import UserProfileSerializer
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
+from rest_framework.parsers import MultiPartParser, FormParser
 
 # Random Questions with Filters
 @api_view(['GET'])
@@ -124,3 +128,51 @@ class OTPVerifyView(APIView):
         if serializer.is_valid():
             return Response({"msg": "Account verified."})
         return Response(serializer.errors, status=400)
+    
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def current_user(request):
+    serializer = UserSerializer(request.user)
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def change_password(request):
+    serializer = ChangePasswordSerializer(data=request.data)
+    if serializer.is_valid():
+        user = request.user
+        old_password = serializer.validated_data['old_password']
+        new_password = serializer.validated_data['new_password']
+
+        if not user.check_password(old_password):
+            return Response({"detail": "Old password is incorrect."}, status=status.HTTP_400_BAD_REQUEST)
+
+        user.set_password(new_password)
+        user.save()
+        return Response({"detail": "Password changed successfully."}, status=status.HTTP_200_OK)
+
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+# class UserProfileView(generics.RetrieveUpdateAPIView):
+#     """
+#     An endpoint for the authenticated user to retrieve and update their profile data,
+#     specifically for uploading a profile picture.
+#     """
+#     queryset = User.objects.all()
+#     serializer_class = UserProfileSerializer
+#     permission_classes = [permissions.IsAuthenticated]
+    
+#     # Key Change: Add parser classes to handle file uploads
+#     parser_classes = [parsers.MultiPartParser, parsers.FormParser]
+
+#     def get_object(self):
+#         """
+#         This view should return an object instance of the currently
+#         authenticated user.
+#         """
+#         # Key Change: The object is simply the request.user
+#         return self.request.user
