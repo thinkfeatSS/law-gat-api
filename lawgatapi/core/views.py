@@ -13,6 +13,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
 
+
+
+class SubjectListView(generics.ListAPIView):
+    queryset = Subject.objects.all()
+    serializer_class = SubjectSerializer
+
+    
 # Random Questions with Filters
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])

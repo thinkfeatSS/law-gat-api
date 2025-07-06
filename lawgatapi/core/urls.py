@@ -12,7 +12,7 @@ urlpatterns = [
     # path('profile/', UserProfileView.as_view(), name='user-profile'),
     path('change-password/', change_password, name='change-password'),
 
-
+    path('subjects/', SubjectListView.as_view(), name='subject-list'),
     path('questions/random/', get_random_questions),
     path('questions/submit/', submit_batch_attempts),
     path('dashboard/', dashboard),
