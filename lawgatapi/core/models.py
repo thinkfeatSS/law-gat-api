@@ -50,3 +50,12 @@ class QuestionAttempt(models.Model):
             models.Index(fields=['user']),
             models.Index(fields=['question']),
         ]
+
+class UserStats(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    correct = models.IntegerField(default=0)
+    wrong = models.IntegerField(default=0)
+    accuracy = models.FloatField(default=0.0)
+    success_score = models.IntegerField(default=1)
+    subject_accuracies = models.JSONField(default=list)  # List of dicts: [{subject, accuracy}, ...]
+    updated_at = models.DateTimeField(auto_now=True)

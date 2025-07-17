@@ -1,7 +1,7 @@
 # core/views.py
 
 from rest_framework import generics, permissions, filters,parsers
-from .models import Subject, Question, QuestionAttempt, User
+from .models import Subject, Question, QuestionAttempt, User, UserStats
 from .serializers import *
 from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.response import Response
@@ -163,6 +163,38 @@ def change_password(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def get_user_stats(request):
+    user = request.user
+    try:
+        stats = UserStats.objects.get(user=user)
+        serializer = UserStatsSerializer(stats)
+        return Response(serializer.data)
+    except UserStats.DoesNotExist:
+        return Response({
+            "correct": 0,
+            "wrong": 0,
+            "accuracy": 0.0,
+            "success_score": 1,
+            "subject_accuracies": [],
+        })
+
+@api_view(['POST', 'PUT'])
+@permission_classes([permissions.IsAuthenticated])
+def save_user_stats(request):
+    user = request.user
+    try:
+        stats = UserStats.objects.get(user=user)
+        serializer = UserStatsSerializer(stats, data=request.data)
+    except UserStats.DoesNotExist:
+        serializer = UserStatsSerializer(data=request.data)
+
+    if serializer.is_valid():
+        stats = serializer.save(user=user)
+        return Response({"message": "Stats saved!"}, status=status.HTTP_200_OK)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # class UserProfileView(generics.RetrieveUpdateAPIView):
 #     """

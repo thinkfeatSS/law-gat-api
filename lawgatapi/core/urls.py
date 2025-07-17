@@ -17,4 +17,6 @@ urlpatterns = [
     path('questions/submit/', submit_batch_attempts),
     path('dashboard/', dashboard),
     path('leaderboard/', leaderboard),
+    path('upload-summary/', save_user_stats),
+    path('get-summary/', get_user_stats),
 ]

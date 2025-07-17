@@ -1,7 +1,7 @@
 # core/serializers.py
 
 from rest_framework import serializers
-from .models import User, Subject, Question, QuestionAttempt
+from .models import User, Subject, Question, QuestionAttempt, UserStats
 from django.core.mail import send_mail
 import random
 
@@ -72,6 +72,13 @@ class ChangePasswordSerializer(serializers.Serializer):
         if len(value) < 8:
             raise serializers.ValidationError("Password must be at least 8 characters long.")
         return value
+
+class UserStatsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserStats
+        fields = ['correct', 'wrong', 'accuracy', 'success_score', 'subject_accuracies']
+
+
 # class ProfileImageSerializer(serializers.ModelSerializer):
 #     profile_picture = serializers.SerializerMethodField()
 
